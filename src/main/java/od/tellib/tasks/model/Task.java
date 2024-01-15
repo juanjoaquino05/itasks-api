@@ -63,4 +63,15 @@ public class Task {
             columnDefinition = "TIMESTAMP WITHOUT TIME ZONE"
     )
     private LocalDateTime dueDate;
+
+    @ManyToOne
+    @JoinColumn(
+            name = "user_id",
+            nullable = false,
+            referencedColumnName = "id",
+            foreignKey = @ForeignKey(
+                    name = "task_user_fk"
+            )
+    )
+    private User user;
 }
