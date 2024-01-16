@@ -5,6 +5,7 @@ import od.tellib.tasks.model.User;
 import od.tellib.tasks.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +20,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<User> getUser(@PathVariable Long id){
         log.info("{} request received.", Thread.currentThread().getStackTrace()[1].getMethodName());
         User user = service.getUsers(id);
