@@ -59,4 +59,14 @@ public class TaskService {
         return ResponseEntity.ok()
                 .body(TaskConverter.convertToDto(toUpdate));
     }
+
+    public Task deleteTask(Long id) {
+        Optional<Task> task = taskRepository.findById(id);
+
+        if(!task.isPresent()) throw new ResourceNotFoundException("Task");
+
+        taskRepository.deleteById(id);
+
+        return task.get();
+    }
 }

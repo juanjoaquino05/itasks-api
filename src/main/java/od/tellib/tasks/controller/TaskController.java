@@ -77,4 +77,13 @@ public class TaskController {
 
         return response;
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTask(@PathVariable Long id) throws Exception {
+        log.info("{} request received.", Thread.currentThread().getStackTrace()[1].getMethodName());
+        var task = service.deleteTask(id);
+        log.info("{} request completed.", Thread.currentThread().getStackTrace()[1].getMethodName());
+
+        return ResponseEntity.noContent().build();
+    }
 }
