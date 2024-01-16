@@ -3,6 +3,14 @@
 ## Overview
 This is a dummy tasks project for interview purposes in Spring Boot
 
+
+## Requirements
+
+Add the following env variables to the intellij running configurations in order to get it working.
+```
+PG_USR={yourPostgresUser};PG_PWD={yourPostgresPass};PG_HST={yourPostgresHost};PG_PORT={yourPostgresPort};JWT_SECRET={yourRandomSuperLongKeySecret}
+```
+
 ## Questions
 1. **How would you handle pagination and ordering of tasks?**
 * Depends on requirements, but mostly with repository pagination.
