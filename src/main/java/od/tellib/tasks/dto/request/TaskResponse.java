@@ -10,4 +10,6 @@ public class TaskResponse {
     private String description;
     private String dueDate;
     private String createdDate;
+    private String status;
+
 }

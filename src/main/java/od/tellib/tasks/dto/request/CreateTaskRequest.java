@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import od.tellib.tasks.model.TaskState;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,4 +29,7 @@ public class CreateTaskRequest {
     @JsonFormat(pattern = DATE_FORMAT_PATTERN)
     @JsonProperty("dueDate")
     private String dueDate;
+
+    @NotBlank
+    private String status;
 }

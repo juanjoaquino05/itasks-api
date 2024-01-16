@@ -65,6 +65,13 @@ public class Task {
     )
     private LocalDate dueDate;
 
+    @Column(
+            name = "status",
+            nullable = false,
+            columnDefinition = "TEXT"
+    )
+    private String status;
+
     @ManyToOne
     @JoinColumn(
             name = "user_id",
