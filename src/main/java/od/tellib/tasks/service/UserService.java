@@ -123,4 +123,14 @@ public class UserService {
         return ResponseEntity.ok()
                 .body(toUpdate);
     }
+
+    public User deleteUser(Long id) {
+        Optional<User> user = userRepository.findById(id);
+
+        if(!user.isPresent()) return null;
+
+        userRepository.deleteById(id);
+
+        return user.get();
+    }
 }

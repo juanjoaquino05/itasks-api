@@ -54,4 +54,14 @@ public class UserController {
 
         return ResponseEntity.ok(new MessageResponse("User modified successfully!"));
     }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) throws Exception {
+        log.info("{} request received.", Thread.currentThread().getStackTrace()[1].getMethodName());
+        var user = service.deleteUser(id);
+        log.info("{} request completed.", Thread.currentThread().getStackTrace()[1].getMethodName());
+
+        return ResponseEntity.ok(user);
+    }
 }
