@@ -1,5 +1,7 @@
 package od.tellib.tasks.service;
 
+import od.tellib.tasks.converter.UserConverter;
+import od.tellib.tasks.dto.request.ModifyUserRequest;
 import od.tellib.tasks.dto.request.SignupRequest;
 import od.tellib.tasks.exception.ResourceNotFoundException;
 import od.tellib.tasks.exception.UserEmailExistsException;
@@ -10,6 +12,7 @@ import od.tellib.tasks.model.User;
 import od.tellib.tasks.repository.RoleRepository;
 import od.tellib.tasks.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -104,5 +107,20 @@ public class UserService {
 
         // Create new user's account
         createUser(signUpRequest);
+    }
+
+    public ResponseEntity modifyUser(ModifyUserRequest request) {
+        var user = userRepository.findByUsername(request.getUsername());
+        if(!user.isPresent()) throw new ResourceNotFoundException("User");
+
+        User toUpdate = user.get();
+
+        request.setPassword(encoder.encode(request.getPassword()));
+        UserConverter.updateUserData(toUpdate, request);
+
+        toUpdate = userRepository.save(toUpdate);
+
+        return ResponseEntity.ok()
+                .body(toUpdate);
     }
 }
