@@ -3,7 +3,9 @@ package od.tellib.tasks.controller;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import od.tellib.tasks.dto.request.CreateTaskRequest;
+import od.tellib.tasks.dto.request.ModifyUserRequest;
 import od.tellib.tasks.dto.request.SignupRequest;
+import od.tellib.tasks.dto.response.MessageResponse;
 import od.tellib.tasks.model.Task;
 import od.tellib.tasks.model.User;
 import od.tellib.tasks.service.TaskService;
@@ -66,5 +68,13 @@ public class TaskController {
         log.info("{} request completed.", Thread.currentThread().getStackTrace()[1].getMethodName());
 
         return new ResponseEntity<>(task, HttpStatus.CREATED);
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> modifyTask(@PathVariable Long id, @Valid @RequestBody CreateTaskRequest request) throws Exception {
+        log.info("{} request received.", Thread.currentThread().getStackTrace()[1].getMethodName());
+        var response = service.modifyTask(id, request);
+        log.info("{} request completed.", Thread.currentThread().getStackTrace()[1].getMethodName());
+
+        return response;
     }
 }

@@ -5,6 +5,7 @@ import od.tellib.tasks.dto.request.ModifyUserRequest;
 import od.tellib.tasks.dto.request.TaskResponse;
 import od.tellib.tasks.model.Task;
 import od.tellib.tasks.model.User;
+import od.tellib.tasks.util.DateUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,10 +19,7 @@ public class TaskConverter {
         newTask.setDescription(request.getDescription());
         newTask.setName(request.getName());
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN);
-        LocalDate dueDate = LocalDate.parse(request.getDueDate(), formatter);
-
-        newTask.setDueDate(dueDate);
+        newTask.setDueDate(DateUtil.parseDate(request.getDueDate(), DATE_FORMAT_PATTERN));
         newTask.setCreatedDate(LocalDate.now());
         newTask.setUser(user);
 
@@ -35,5 +33,11 @@ public class TaskConverter {
         response.setCreatedDate(task.getCreatedDate().toString());
 
         return response;
+    }
+
+    public static void updateUserData(Task toUpdate, CreateTaskRequest request) {
+        toUpdate.setName(request.getName());
+        toUpdate.setDescription(request.getDescription());
+        toUpdate.setDueDate(DateUtil.parseDate(request.getDueDate(), DATE_FORMAT_PATTERN));
     }
 }
