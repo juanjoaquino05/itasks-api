@@ -1,20 +1,31 @@
 package od.tellib.tasks.service;
 
+import od.tellib.tasks.dto.request.SignupRequest;
 import od.tellib.tasks.exception.ResourceNotFoundException;
+import od.tellib.tasks.exception.UserEmailExistsException;
+import od.tellib.tasks.exception.UsernameTakenException;
+import od.tellib.tasks.model.ERole;
+import od.tellib.tasks.model.Role;
 import od.tellib.tasks.model.User;
+import od.tellib.tasks.repository.RoleRepository;
 import od.tellib.tasks.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
 
     public User getUsers(Long id) {
@@ -22,5 +33,61 @@ public class UserService {
         if(!user.isPresent()) throw new ResourceNotFoundException("User");
 
         return user.get();
+    }
+
+    public boolean existsByUserName(String username) {
+        return userRepository.findByUsername(username).isPresent();
+    }
+
+    public void createUser(SignupRequest request) {
+        User user = new User(request.getUsername(), request.getEmail(), request.getPassword());
+
+        Set<String> strRoles = request.getRole();
+        Set<Role> roles = new HashSet<>();
+
+        if (strRoles == null) {
+            Role userRole = getRole(ERole.ROLE_USER)
+                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+            roles.add(userRole);
+        } else {
+            strRoles.forEach(role -> {
+                switch (role) {
+                    case "admin":
+                        Role adminRole = getRole(ERole.ROLE_ADMIN)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(adminRole);
+
+                        break;
+                    case "mod":
+                        Role modRole = getRole(ERole.ROLE_MODERATOR)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(modRole);
+
+                        break;
+                    default:
+                        Role userRole = getRole(ERole.ROLE_USER)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(userRole);
+                }
+            });
+        }
+
+        user.setRoles(roles);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setEnabled(true);
+    }
+
+    public void validateIfUserExists(SignupRequest signUpRequest) {
+        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+            throw new UsernameTakenException();
+        }
+
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            throw new UserEmailExistsException();
+        }
+    }
+
+    public Optional<Role> getRole(ERole eRole) {
+        return roleRepository.findByName(eRole.name());
     }
 }
