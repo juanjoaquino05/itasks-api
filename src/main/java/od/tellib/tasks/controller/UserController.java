@@ -8,6 +8,7 @@ import od.tellib.tasks.dto.response.MessageResponse;
 import od.tellib.tasks.model.User;
 import od.tellib.tasks.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -39,10 +40,10 @@ public class UserController {
     @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<?> createUser(@Valid @RequestBody SignupRequest request) throws Exception {
         log.info("{} request received.", Thread.currentThread().getStackTrace()[1].getMethodName());
-        service.registerUser(request);
+        User user = service.registerUser(request);
         log.info("{} request completed.", Thread.currentThread().getStackTrace()[1].getMethodName());
 
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     @PutMapping
@@ -62,6 +63,6 @@ public class UserController {
         var user = service.deleteUser(id);
         log.info("{} request completed.", Thread.currentThread().getStackTrace()[1].getMethodName());
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.noContent().build();
     }
 }

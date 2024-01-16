@@ -46,7 +46,7 @@ public class UserService {
         return userRepository.findByUsername(username).isPresent();
     }
 
-    public void createUser(SignupRequest request) {
+    public User createUser(SignupRequest request) {
         User user = new User(request.getUsername(), request.getEmail(), request.getPassword());
 
         Set<String> strRoles = request.getRole();
@@ -83,7 +83,7 @@ public class UserService {
         user.setCreatedAt(LocalDateTime.now());
         user.setEnabled(true);
 
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     public void validateIfUserExists(SignupRequest signUpRequest) {
@@ -100,13 +100,13 @@ public class UserService {
         return roleRepository.findByName(eRole.name());
     }
 
-    public void registerUser(SignupRequest signUpRequest) {
+    public User registerUser(SignupRequest signUpRequest) {
         validateIfUserExists(signUpRequest);
 
         signUpRequest.setPassword(encoder.encode(signUpRequest.getPassword()));
 
         // Create new user's account
-        createUser(signUpRequest);
+        return createUser(signUpRequest);
     }
 
     public ResponseEntity modifyUser(ModifyUserRequest request) {
@@ -127,7 +127,7 @@ public class UserService {
     public User deleteUser(Long id) {
         Optional<User> user = userRepository.findById(id);
 
-        if(!user.isPresent()) return null;
+        if(!user.isPresent()) throw new ResourceNotFoundException("User");
 
         userRepository.deleteById(id);
 
