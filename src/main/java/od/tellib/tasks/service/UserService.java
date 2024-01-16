@@ -10,6 +10,7 @@ import od.tellib.tasks.model.User;
 import od.tellib.tasks.repository.RoleRepository;
 import od.tellib.tasks.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,10 +23,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
+    private final PasswordEncoder encoder;
+
     @Autowired
-    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.encoder = encoder;
     }
 
     public User getUsers(Long id) {
@@ -58,7 +62,7 @@ public class UserService {
                         roles.add(adminRole);
 
                         break;
-                    case "mod":
+                    case "moderator":
                         Role modRole = getRole(ERole.ROLE_MODERATOR)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(modRole);
@@ -75,6 +79,8 @@ public class UserService {
         user.setRoles(roles);
         user.setCreatedAt(LocalDateTime.now());
         user.setEnabled(true);
+
+        userRepository.save(user);
     }
 
     public void validateIfUserExists(SignupRequest signUpRequest) {
@@ -89,5 +95,14 @@ public class UserService {
 
     public Optional<Role> getRole(ERole eRole) {
         return roleRepository.findByName(eRole.name());
+    }
+
+    public void registerUser(SignupRequest signUpRequest) {
+        validateIfUserExists(signUpRequest);
+
+        signUpRequest.setPassword(encoder.encode(signUpRequest.getPassword()));
+
+        // Create new user's account
+        createUser(signUpRequest);
     }
 }

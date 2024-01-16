@@ -18,7 +18,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,15 +31,13 @@ public class AuthController {
 
     final AuthenticationManager authenticationManager;
     final UserService userService;
-    final PasswordEncoder encoder;
     final JwtUtils jwtUtils;
 
     @Autowired
-    public AuthController(UserService userService, JwtUtils jwtUtils, AuthenticationManager authenticationManager, PasswordEncoder encoder) {
+    public AuthController(UserService userService, JwtUtils jwtUtils, AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
-        this.encoder = encoder;
     }
 
     @PostMapping("/signin")
@@ -62,12 +59,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        userService.validateIfUserExists(signUpRequest);
-
-        signUpRequest.setPassword(encoder.encode(signUpRequest.getPassword()));
-
-        // Create new user's account
-        userService.createUser(signUpRequest);
+        userService.registerUser(signUpRequest);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }

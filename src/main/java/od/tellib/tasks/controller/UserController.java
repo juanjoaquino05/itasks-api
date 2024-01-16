@@ -1,6 +1,9 @@
 package od.tellib.tasks.controller;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import od.tellib.tasks.dto.request.SignupRequest;
+import od.tellib.tasks.dto.response.MessageResponse;
 import od.tellib.tasks.model.User;
 import od.tellib.tasks.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,5 +30,15 @@ public class UserController {
         log.info("{} request completed.", Thread.currentThread().getStackTrace()[1].getMethodName());
 
         return ResponseEntity.ok().body(user);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+    public ResponseEntity<?> createUser(@Valid @RequestBody SignupRequest request) throws Exception {
+        log.info("{} request received.", Thread.currentThread().getStackTrace()[1].getMethodName());
+        service.registerUser(request);
+        log.info("{} request completed.", Thread.currentThread().getStackTrace()[1].getMethodName());
+
+        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 }
