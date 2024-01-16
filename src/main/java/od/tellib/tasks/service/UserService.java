@@ -35,8 +35,14 @@ public class UserService {
         this.encoder = encoder;
     }
 
-    public User getUsers(Long id) {
+    public User getUser(Long id) {
         Optional<User> user = userRepository.findById(id);
+        if(!user.isPresent()) throw new ResourceNotFoundException("User");
+
+        return user.get();
+    }
+    public User getUser(String username) {
+        Optional<User> user = userRepository.findByUsername(username);
         if(!user.isPresent()) throw new ResourceNotFoundException("User");
 
         return user.get();

@@ -30,7 +30,7 @@ public class UserController {
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<User> getUser(@PathVariable Long id){
         log.info("{} request received.", Thread.currentThread().getStackTrace()[1].getMethodName());
-        User user = service.getUsers(id);
+        User user = service.getUser(id);
         log.info("{} request completed.", Thread.currentThread().getStackTrace()[1].getMethodName());
 
         return ResponseEntity.ok().body(user);
