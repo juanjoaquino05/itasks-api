@@ -1,10 +1,15 @@
 package od.tellib.tasks.controller;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import od.tellib.tasks.dto.request.CreateTaskRequest;
+import od.tellib.tasks.dto.request.SignupRequest;
 import od.tellib.tasks.model.Task;
+import od.tellib.tasks.model.User;
 import od.tellib.tasks.service.TaskService;
 import od.tellib.tasks.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -51,5 +56,15 @@ public class TaskController {
         log.info("{} request completed.", Thread.currentThread().getStackTrace()[1].getMethodName());
 
         return ResponseEntity.ok().body(task);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createTask(@RequestBody CreateTaskRequest request) throws Exception {
+        log.info("{} request received.", Thread.currentThread().getStackTrace()[1].getMethodName());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        var task = service.createTask(request, userService.getUser(auth.getName()));
+        log.info("{} request completed.", Thread.currentThread().getStackTrace()[1].getMethodName());
+
+        return new ResponseEntity<>(task, HttpStatus.CREATED);
     }
 }

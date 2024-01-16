@@ -1,5 +1,8 @@
 package od.tellib.tasks.service;
 
+import od.tellib.tasks.converter.TaskConverter;
+import od.tellib.tasks.dto.request.CreateTaskRequest;
+import od.tellib.tasks.dto.request.TaskResponse;
 import od.tellib.tasks.exception.ResourceNotFoundException;
 import od.tellib.tasks.model.Task;
 import od.tellib.tasks.model.User;
@@ -34,5 +37,10 @@ public class TaskService {
 
         List<Task> tasks = taskRepository.findAll();
         return tasks;
+    }
+
+    public TaskResponse createTask(CreateTaskRequest request, User user) {
+        var newTask = TaskConverter.convertToModel(user, request);
+        return TaskConverter.convertToDto(taskRepository.save(newTask));
     }
 }
